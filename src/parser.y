@@ -9,19 +9,19 @@
 
     void yyerror(const char *s);
 
-    typedef ENUM {
+    typedef enum {
         SOMA, MENOS, MULTI, DIVISAO, ATRIBUICAO, MAIOR, MENOR, MAIORI, MENORI, IGUAL, DIFERENTE
     } Operador;
 
 %}
 
-$union{
+%union{
     int ival;
     char *id;
     Operador op;
 }
 
-%token<ival>T_NUM
+%token<ival> T_NUM
 %token<id> T_ID
 
 %token <op> T_SOMA T_MENOS T_MULTI T_DIVISAO T_MAIOR T_MENOR T_MAIORI T_MENORI T_IGUAL T_DIFERENTE
@@ -31,10 +31,11 @@ $union{
 
 %token T_NLINHA
 
-%left T_SOMA T_MENOS T_MULTI T_DIVISAO
+%left T_SOMA T_MENOS 
+%left T_MULTI T_DIVISAO
 
-%type <ival> soma_exp
-%type <ival> termo
+%type <op> rel soma mult
+%type <ival> soma_exp termo fator simples_exp exp
 
 
 %start programa
@@ -61,8 +62,8 @@ var_decl:
     ;
 
 tipo_espec:
-    T_INT
-    | T_VOID
+    T_INT {$$ = $1}
+    | T_VOID {{$$ = $1}}
     ;
 
 fun-decl:
@@ -137,11 +138,11 @@ var:
 
 simples_exp:
     soma_exp rel soma_exp {
-        switch (op){
+        switch ($2){
             case MENORI:
                 $$ = $1 <= $3;                
                 break;
-            case MENOR;
+            case MENOR:
                 $$ = $1 < $3;
                 break;
             case MAIOR:
@@ -156,13 +157,13 @@ simples_exp:
             case DIFERENTE:
                 $$ = $1 != $3;
                 break;
-            case default:
+            default:
                 fprintf(stderr("Erro semantico, esperado sinais >,>=,<,<=,==,!=, recebido:) $2);
         }
         
     }
-    | soma_exp
-
+    | soma_exp { $$ = $1; }
+ 
 rel:
     T_MENORI {$$ = MENORI;}
     | T_MENOR {$$ = MENOR;}
@@ -184,7 +185,7 @@ soma_exp:
             fprintf(stderr, "Esperado + ou -, recebido", $2);
         }
     }
-    | termo
+    | termo { $$ = $1; }
     ;
 
 soma:
@@ -206,11 +207,12 @@ termo:
             }
         }
     }
-    | fator; {$$ = $1;}
+    | fator {$$ = $1;}
+    ;
 
 mult:
-    T_MULTI {$$ = '*';}
-    | T_DIVISAO {$$ = '/';}
+    T_MULTI {$$ = MULTI;}
+    | T_DIVISAO {$$ = DIVISAO;}
     ;
 
 fator:
