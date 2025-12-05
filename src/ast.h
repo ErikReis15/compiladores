@@ -6,11 +6,13 @@ typedef enum { OP, VAL } Tipo;
 typedef struct AST {
     Tipo tipo;
     union {
-        char operador;
-        float valor;
+        char *id;
+        int valor;
+        Operador operador;
     } dado; 
     struct AST* esquerda;
     struct AST* direita;
+    struct AST* meio;
 } AST;
 
 AST* NoOp(char operador, AST* esquerda, AST* direita);

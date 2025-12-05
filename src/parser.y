@@ -10,15 +10,18 @@
     void yyerror(const char *s);
 
     typedef enum {
-        SOMA, MENOS, MULTI, DIVISAO, ATRIBUICAO, MAIOR, MENOR, MAIORI, MENORI, IGUAL, DIFERENTE
-    } Operador;
+        SOMA, MENOS, MULTI, DIVISAO, ATRIBUICAO, MAIOR, MENOR, MAIORI, MENORI, IGUAL, DIFERENTE,
+
+        VAL, ID, OP, IF, WHILE, SEQ, INT, VOID, PARAM, CHAMADA, FUNCAO
+    } Tipo;
 
 %}
 
 %union{
     int ival;
     char *id;
-    Operador op;
+    AST* ast;
+    Tipo op;
 }
 
 %token<ival> T_NUM
@@ -34,8 +37,9 @@
 %left T_SOMA T_MENOS 
 %left T_MULTI T_DIVISAO
 
-%type <op> rel soma mult
-%type <ival> soma_exp termo fator simples_exp exp
+%type <ast> soma_exp termo fator simples_exp exp
+%type <ast> rel soma mult
+%type <ast> var state exp_decl sel_decl ite_decl
 
 
 %start programa
@@ -47,33 +51,50 @@ programa:
     ;
 
 decl_lista:
-    decl_lista decl
-    | decl
+    decl_lista decl { $$ = novoNo(SEQ)}
+    | decl {$$ = $1}
     ;
 
 decl:
-    var-decl
-    | fun-decl
+    var_decl {$$ = $1}
+    | fun_decl {$$ = $1}
     ;
 
 var_decl:
-    tipo-espec T_ID T_PONTOEVIRGULA
-    | tipo-espec T_ID T_ACOLCHETE T_NUM T_FCOLCHETE T_PONTOEVIRGULA
+    tipo_espec T_ID T_PONTOEVIRGULA {
+        $$ = novoNo(ID);
+        $$->dado.id = $2;
+        $$->esquerda = $1;
+    }
+    | tipo_espec T_ID T_ACOLCHETE T_NUM T_FCOLCHETE T_PONTOEVIRGULA {
+        $$ = novoNo(ID);
+        $$->dado.id = $2;
+        $$->esquerda = $1;
+        $$->direita = $4;
+        $$->direita->dado.valor = $4;
+    }
     ;
 
 tipo_espec:
-    T_INT {$$ = $1}
-    | T_VOID {{$$ = $1}}
+    T_INT {$$ = novoNo(INT);}
+    | T_VOID {$$ = novoNo(VOID);}
     ;
 
-fun-decl:
+fun_decl:
     tipo_espec T_ID T_APARENTESES params T_FPARENTESES comp_decl
+    {
+        $$ = novoNo(FUNCAO);
+        $$->dado.id = $2;
+        $$->esquerda = $1;
+        $$->meio = $4;
+        $$->direita = $6;
+    }
     ;
 
 params:
-    param_list
-    | T_VOID
-    ;
+    param_list {$$ = $1;}
+    | T_VOID {$$ = novoNo(VOID);}
+    ; 
 
 param_list:
     param_list T_VIRGULA param
@@ -100,25 +121,44 @@ state_lista:
     ;
 
 state:
-    exp-decl 
-    | comp_decl
-    | sel_decl
-    | ite_decl
-    | ret_decl
+    exp-decl {$$ = $1}
+    | comp_decl {$$ = $1}
+    | sel_decl {$$ = $1}
+    | ite_decl {$$ = $1}
+    | ret_decl {$$ = $1}
     ;
 
 exp_decl:
-    exp T_PONTOEVIRGULA
-    | T_PONTOEVIRGULA
+    exp T_PONTOEVIRGULA {
+        $$ = $1;
+        }
+    | T_PONTOEVIRGULA {$$ = NULL;}
     ;
 
 sel_decl:
-    T_IF T_APARENTESES exp T_FPARENTESES state
-    | T_IF T_APARENTESES exp T_FPARENTESES state T_ELSE state
+    T_IF T_APARENTESES exp T_FPARENTESES state {
+        $$ = novoNo(IF);
+        $$->dado.operador = IF;
+        $$->esquerda = $3;
+        $$->direita = $5;
+        }
+
+    | T_IF T_APARENTESES exp T_FPARENTESES state T_ELSE state {
+        $$ = novoNo(IF);
+        $$->dado.operador = IF;
+        $$->esquerda = $3;
+        $$->meio = $5;
+        $$->direita = $7;
+        }
     ;
 
 ite_decl:
-    T_WHILE T_APARENTESES exp T_FPARENTESES state
+    T_WHILE T_APARENTESES exp T_FPARENTESES state {
+        $$ = novoNo(WHILE);
+        $$ = dado.operador = WHILE;
+        $$->esquerda = $3;
+        $$->direita = $5;
+        }
     ;
 
 ret_decl:
@@ -127,111 +167,119 @@ ret_decl:
     ;
 
 exp:
-    var T_ATRIBUICAO 
-    | simples_exp
+    var T_ATRIBUICAO exp{
+        $$ = novoNo(OP);
+        $$->dado.operador = ATRIBUICAO;
+        $$->esquerda = $1;
+        $$->direita = $3
+        }
+    | simples_exp {$$ = $1;}
     ;
 
 var:
-    T_ID
-    | T_ID T_ACOLCHETE exp T_FCOLCHETE
+    T_ID {
+        $$ = novoNo(ID);
+        $$->dado.id = $1;
+        }
+
+    | T_ID T_ACOLCHETE exp T_FCOLCHETE {
+        $$ = novoNo(ID);
+        $$ = $1;
+        $$->direita = $3;
+        }
     ;
 
 simples_exp:
     soma_exp rel soma_exp {
-        switch ($2){
-            case MENORI:
-                $$ = $1 <= $3;                
-                break;
-            case MENOR:
-                $$ = $1 < $3;
-                break;
-            case MAIOR:
-                $$ = $1 > $3;
-                break;
-            case MAIORI:
-                $$ = $1 >= $3;
-                break;
-            case IGUAL:
-                $$ = $1 == $3;
-                break;
-            case DIFERENTE:
-                $$ = $1 != $3;
-                break;
-            default:
-                fprintf(stderr("Erro semantico, esperado sinais >,>=,<,<=,==,!=, recebido:) $2);
+        $$ = $2;
+        $$->esquerda = $1;
+        $$->direita = $3;
         }
-        
-    }
-    | soma_exp { $$ = $1; }
+    | soma_exp {$$ = $1;}
  
 rel:
-    T_MENORI {$$ = MENORI;}
-    | T_MENOR {$$ = MENOR;}
-    | T_MAIOR {$$ = MAIOR;}
-    | T_MAIORI {$$ = MAIORI;}
-    | T_IGUAL {$$ = IGUAL;}
-    | T_DIFERENTE {$$ = DIFERENTE;}
+    T_MENORI {$$ = novoNo(OP);
+              $$->dado.operador = MENORI;}
+    | T_MENOR {$$ = novoNo(OP);
+               $$->dado.operador = MENOR;}
+    | T_MAIOR {$$ = novoNo(OP);
+               $$->dado.operador = MAIOR;}
+    | T_MAIORI {$$ = novoNo(OP);
+                $$->dado.operador = MAIORI;}
+    | T_IGUAL {$$ = novoNo(OP);
+               $$->dado.operador = IGUAL;}
+    | T_DIFERENTE {$$ = novoNo(OP);
+               $$->dado.operador = DIFERENTE;}
     ;
 
 soma_exp:
     soma_exp soma termo{
-        if ($2 = SOMA){
-            $$ = $1 + $3;
-        }
-        elseif ($2 = MENOS){
-            $$ = $1 - $3;
-        }
-        else{
-            fprintf(stderr, "Esperado + ou -, recebido", $2);
-        }
+        $$ = $2;
+        $$->esquerda = $1;
+        $$->direita = $3;
     }
-    | termo { $$ = $1; }
+    | termo {$$ = $1;}
     ;
 
 soma:
-    T_SOMA {$$ = SOMA;}
-    | T_MENOS {$$ = MENOS;}
+    T_SOMA {
+        $$ = novoNo(OP);
+        $$->dado.operador = SOMA;
+        }
+    | T_MENOS {
+        $$ = novoNo(OP);
+        $$->dado.operador = MENOS;
+        }
     ;
 
 termo:
     termo mult fator {
-        if($2 = MULTI){
-            $$ = $1 * $3;
+        $$ = $2;
+        $$->esquerda = $1;
+        $$->direita = $3;
         }
-        else{
-            if($3 !=0){
-                $$ = $1 / $3;
-            }
-            else{
-                fprintf(stderr, "Erro semantico: divisao por 0 ");
-            }
-        }
-    }
     | fator {$$ = $1;}
     ;
 
 mult:
-    T_MULTI {$$ = MULTI;}
-    | T_DIVISAO {$$ = DIVISAO;}
+    T_MULTI {
+        $$ = novoNo(OP);
+        $$->dado.operador = MULTI;
+        }
+    | T_DIVISAO {
+        $$ = novoNo(OP);
+        $$->dado.operador = DIVISAO;
+        }
     ;
 
 fator:
     T_APARENTESES exp T_FPARENTESES {$$ = $2}
-    | var   {$$ = $1}
+    | var {$$ = $1}
     | ativacao {$$ = $1}
-    | T_NUM {$$ = $1}
+    | T_NUM {
+        $$ = novoNo(VAL);
+        $$->dado.int = $1;
+        }
     ;
 
 ativacao: 
-    T_ID T_APARENTESES args T_FPARENTESES
+    T_ID T_APARENTESES args T_FPARENTESES{
+        $$ = novoNo(CHAMADA);
+        $$->dado.id = $1;
+        $$->direita = $3;
+        }
     ;
 
 args:
-    args_list
-    |
+    args_list {$$ = $1}
+    | {$$ = NULL;}
     ;
 
 args_list:
-    args_list T_VIRGULA exp
-    | exp
+    args_list T_VIRGULA exp {
+        $$ = novoNo(SEQ);
+        $$->esquerda = $1;
+        $$->direita = $3;
+    }
+    | exp {$$ = $1;}
     ;
