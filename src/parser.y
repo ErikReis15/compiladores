@@ -3,31 +3,34 @@
     #include <stdlib.h>
     #include <string.h>
 
+    #include "ast.h"
+
     extern int yylex(void);
     extern int yyparse(void);
     extern FILE *yyin;
+    extern int lineno;
+    extern char* yytext;
+    extern int yychar;
+    AST *raiz = NULL;
 
-    void yyerror(const char *s);
-
-    typedef enum {
-        SOMA, MENOS, MULTI, DIVISAO, ATRIBUICAO, MAIOR, MENOR, MAIORI, MENORI, IGUAL, DIFERENTE,
-
-        VAL, ID, OP, IF, WHILE, SEQ, INT, VOID, PARAM, CHAMADA, FUNCAO
-    } Tipo;
+    int error_token = -1;
+    void yyerror(char *s);
 
 %}
+
+
+%define parse.error verbose
 
 %union{
     int ival;
     char *id;
     AST* ast;
-    Tipo op;
 }
 
 %token<ival> T_NUM
 %token<id> T_ID
 
-%token <op> T_SOMA T_MENOS T_MULTI T_DIVISAO T_MAIOR T_MENOR T_MAIORI T_MENORI T_IGUAL T_DIFERENTE
+%token T_SOMA T_MENOS T_MULTI T_DIVISAO T_MAIOR T_MENOR T_MAIORI T_MENORI T_IGUAL T_DIFERENTE
 %token T_ACOMENTARIO T_FCOMENTARIO T_ACOLCHETE T_FCOLCHETE T_APARENTESES T_FPARENTESES T_ATRIBUICAO T_ACHAVE T_FCHAVE T_PONTOEVIRGULA T_VIRGULA
 
 %token T_IF T_ELSE T_WHILE T_INT T_VOID T_RETURN T_MAIN
@@ -37,40 +40,44 @@
 %left T_SOMA T_MENOS 
 %left T_MULTI T_DIVISAO
 
-%type <ast> soma_exp termo fator simples_exp exp
-%type <ast> rel soma mult
-%type <ast> var state exp_decl sel_decl ite_decl
-
+%type <ast> programa decl_lista decl var_decl tipo_espec fun_decl params param_list param
+%type <ast> comp_decl local_decl state_lista state exp_decl sel_decl ite_decl ret_decl
+%type <ast> exp var simples_exp rel soma_exp soma termo mult fator ativacao args args_list
 
 %start programa
 
 %%
 
 programa:
-    decl_lista
+    decl_lista {raiz = $1;}
     ;
 
 decl_lista:
-    decl_lista decl { $$ = novoNo(SEQ)}
-    | decl {$$ = $1}
+    decl_lista decl { 
+        AST *seq = novoNo(SEQ);
+        seq->esquerda = $1;
+        seq->direita  = $2;
+        $$ = seq;
+        }
+    | decl {$$ = $1;}
     ;
 
 decl:
-    var_decl {$$ = $1}
-    | fun_decl {$$ = $1}
+    var_decl {$$ = $1;}
+    | fun_decl {$$ = $1;}
     ;
 
 var_decl:
     tipo_espec T_ID T_PONTOEVIRGULA {
         $$ = novoNo(ID);
-        $$->dado.id = $2;
+        $$->dado.id = strdup($2);
         $$->esquerda = $1;
     }
     | tipo_espec T_ID T_ACOLCHETE T_NUM T_FCOLCHETE T_PONTOEVIRGULA {
         $$ = novoNo(ID);
-        $$->dado.id = $2;
+        $$->dado.id = strdup($2);
         $$->esquerda = $1;
-        $$->direita = $4;
+        $$->direita = novoNo(VAL);
         $$->direita->dado.valor = $4;
     }
     ;
@@ -84,7 +91,7 @@ fun_decl:
     tipo_espec T_ID T_APARENTESES params T_FPARENTESES comp_decl
     {
         $$ = novoNo(FUNCAO);
-        $$->dado.id = $2;
+        $$->dado.id = strdup($2);;
         $$->esquerda = $1;
         $$->meio = $4;
         $$->direita = $6;
@@ -93,31 +100,58 @@ fun_decl:
 
 params:
     param_list {$$ = $1;}
-    | T_VOID {$$ = novoNo(VOID);}
+    | T_VOID {
+        $$ = novoNo(VOID);
+    }
     ; 
 
 param_list:
-    param_list T_VIRGULA param
-    | param
+    param_list T_VIRGULA param{ 
+        $$ = novoNo(SEQ);
+        $$->esquerda = $1;
+        $$->direita = $3; 
+        }
+    | param {$$ = $1;}
     ;
 
 param:
-    tipo_espec T_ID
-    | tipo_espec T_ID T_ACOLCHETE T_FCOLCHETE
+    tipo_espec T_ID {
+        $$ = novoNo(PARAM);
+        $$->dado.id = strdup($2);
+        $$->esquerda = $1;
+    }
+    | tipo_espec T_ID T_ACOLCHETE T_FCOLCHETE {
+        $$ = novoNo(PARAM);
+        $$->dado.id = strdup($2);
+        $$->esquerda = $1;
+        $$->meio = novoNo(VAL);
+    }
     ;
 
 comp_decl:
-    T_ACHAVE local_decl state_lista T_FCHAVE
+    T_ACHAVE local_decl state_lista T_FCHAVE {
+        $$ = novoNo(SEQ);
+        $$->esquerda = $2;
+        $$->direita = $3;
+    }
     ;
 
 local_decl:
-    local_decl var_decl
-    |
+    local_decl var_decl {
+        $$ = novoNo(SEQ);
+        $$->esquerda = $1;
+        $$->direita = $2;
+    }
+    | {$$ = NULL;}
     ;
 
 state_lista:
-    state_lista state
-    |
+    state_lista state {
+        $$ = novoNo(SEQ);
+        $$->esquerda = $1;
+        $$->direita = $2;
+    }
+    | {$$ = NULL;}
     ;
 
 state:
@@ -129,9 +163,7 @@ state:
     ;
 
 exp_decl:
-    exp T_PONTOEVIRGULA {
-        $$ = $1;
-        }
+    exp T_PONTOEVIRGULA {$$ = $1;}
     | T_PONTOEVIRGULA {$$ = NULL;}
     ;
 
@@ -140,12 +172,12 @@ sel_decl:
         $$ = novoNo(IF);
         $$->dado.operador = IF;
         $$->esquerda = $3;
-        $$->direita = $5;
+        $$->meio = $5;
         }
 
     | T_IF T_APARENTESES exp T_FPARENTESES state T_ELSE state {
-        $$ = novoNo(IF);
-        $$->dado.operador = IF;
+        $$ = novoNo(IF_ELSE);
+        $$->dado.operador = IF_ELSE;
         $$->esquerda = $3;
         $$->meio = $5;
         $$->direita = $7;
@@ -155,15 +187,20 @@ sel_decl:
 ite_decl:
     T_WHILE T_APARENTESES exp T_FPARENTESES state {
         $$ = novoNo(WHILE);
-        $$ = dado.operador = WHILE;
+        $$->dado.operador = WHILE;
         $$->esquerda = $3;
         $$->direita = $5;
         }
     ;
 
 ret_decl:
-    T_RETURN T_PONTOEVIRGULA
-    | T_RETURN exp T_PONTOEVIRGULA
+      T_RETURN T_PONTOEVIRGULA {
+            $$ = novoNo(RETURN);
+      }
+    | T_RETURN exp T_PONTOEVIRGULA {
+            $$ = novoNo(RETURN);
+            $$->esquerda = $2;
+      }
     ;
 
 exp:
@@ -171,7 +208,7 @@ exp:
         $$ = novoNo(OP);
         $$->dado.operador = ATRIBUICAO;
         $$->esquerda = $1;
-        $$->direita = $3
+        $$->direita = $3;
         }
     | simples_exp {$$ = $1;}
     ;
@@ -179,12 +216,12 @@ exp:
 var:
     T_ID {
         $$ = novoNo(ID);
-        $$->dado.id = $1;
+        $$->dado.id = strdup($1);
         }
 
     | T_ID T_ACOLCHETE exp T_FCOLCHETE {
         $$ = novoNo(ID);
-        $$ = $1;
+        $$->dado.id = strdup($1);
         $$->direita = $3;
         }
     ;
@@ -253,12 +290,12 @@ mult:
     ;
 
 fator:
-    T_APARENTESES exp T_FPARENTESES {$$ = $2}
-    | var {$$ = $1}
-    | ativacao {$$ = $1}
+    T_APARENTESES exp T_FPARENTESES {$$ = $2;}
+    | var {$$ = $1;}
+    | ativacao {$$ = $1;}
     | T_NUM {
         $$ = novoNo(VAL);
-        $$->dado.int = $1;
+        $$->dado.valor = $1;
         }
     ;
 
@@ -271,7 +308,7 @@ ativacao:
     ;
 
 args:
-    args_list {$$ = $1}
+    args_list {$$ = $1;}
     | {$$ = NULL;}
     ;
 
@@ -283,3 +320,9 @@ args_list:
     }
     | exp {$$ = $1;}
     ;
+
+%%
+
+void yyerror(char *s){
+    fprintf(stderr," %s - LINHA: %d\n", s,lineno);
+}
