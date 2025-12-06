@@ -155,11 +155,11 @@ state_lista:
     ;
 
 state:
-    exp_decl {$$ = $1}
-    | comp_decl {$$ = $1}
-    | sel_decl {$$ = $1}
-    | ite_decl {$$ = $1}
-    | ret_decl {$$ = $1}
+    exp_decl {$$ = $1;}
+    | comp_decl {$$ = $1;}
+    | sel_decl {$$ = $1;}
+    | ite_decl {$$ = $1;}
+    | ret_decl {$$ = $1;}
     ;
 
 exp_decl:
