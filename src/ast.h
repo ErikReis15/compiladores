@@ -2,7 +2,7 @@
 #define AST_H
 
     typedef enum {
-        VAL, ID, OP, IF, WHILE, SEQ, INT, VOID, PARAM, CHAMADA, FUNCAO, IF_ELSE, RETURN 
+        VAL, ID, OP, IF, WHILE, SEQ, INT, VOID, PARAM, CHAMADA, FUNCAO, IF_ELSE, RETURN, DECLARA, DECLARAVETOR, INDEFINIDO
     } Tipo;
 
     typedef enum {
@@ -11,11 +11,13 @@
 
 typedef struct AST {
     Tipo tipo;
+    Tipo tipoValor;  // int ou void para variavel e retornos
     union {
         char *id;
         int valor;
         Operador operador;
     } dado; 
+    int linha;
     struct AST* esquerda;
     struct AST* direita;
     struct AST* meio;
@@ -23,11 +25,6 @@ typedef struct AST {
 
 AST *novoNo(Tipo tipo);
 
-// void printAST(AST *n, int nivel);
-
-void printTree(AST* root);
-int getHeight(AST* root);
-void fillBuffer(AST* node, int level, int left, int right);
-
+void printAST(AST *n, int nivel);
 
 #endif 

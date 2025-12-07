@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "ast.h"
+#include "tabelaSimbolo.h"
 
 extern AST *raiz;
+extern Simbolo *listaSimbolo;
 
 extern FILE *yyin;
 extern int yyparse(void);
@@ -15,9 +17,15 @@ int main(int argc, char **argv){
     }
 
     if (yyparse() == 0) {
-        printTree(raiz);
+        printf("=== SEMANTICO ===\n");
+        printAST(raiz, 0);
+        entraEscopo("global");
+        analisa(raiz);
+        saiEscopo();
+        imprimeTabela(listaSimbolo);
     } 
 
+ 
     if (yyin != stdin) fclose(yyin);
     return 0;
 }

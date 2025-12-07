@@ -14,7 +14,7 @@
     AST *raiz = NULL;
 
     int error_token = -1;
-    void yyerror(char *s);
+    void yyerror(const char *s);
 
 %}
 
@@ -69,16 +69,18 @@ decl:
 
 var_decl:
     tipo_espec T_ID T_PONTOEVIRGULA {
-        $$ = novoNo(ID);
+        $$ = novoNo(DECLARA);
         $$->dado.id = strdup($2);
+        $$->linha = lineno;
         $$->esquerda = $1;
     }
     | tipo_espec T_ID T_ACOLCHETE T_NUM T_FCOLCHETE T_PONTOEVIRGULA {
-        $$ = novoNo(ID);
+        $$ = novoNo(DECLARAVETOR);
         $$->dado.id = strdup($2);
         $$->esquerda = $1;
         $$->direita = novoNo(VAL);
         $$->direita->dado.valor = $4;
+        $$->linha = lineno;
     }
     ;
 
@@ -95,6 +97,7 @@ fun_decl:
         $$->esquerda = $1;
         $$->meio = $4;
         $$->direita = $6;
+        $$->linha = lineno;
     }
     ;
 
@@ -323,6 +326,6 @@ args_list:
 
 %%
 
-void yyerror(char *s){
+void yyerror(const char *s){
     fprintf(stderr," %s - LINHA: %d\n", s,lineno);
 }

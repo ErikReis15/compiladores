@@ -1,0 +1,1 @@
+char * operadorToString(Operador op);
