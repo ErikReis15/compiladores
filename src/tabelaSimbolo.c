@@ -108,13 +108,14 @@ void analisa(AST *n) {
             break;
 
         case PARAM:
-            declara(n->dado.id, PARAM, n->linha);
+            declara(n->dado.id, n->esquerda->tipo, n->linha);
+            n->tipoValor = n->esquerda->tipo;
             break;
 
         case DECLARA:
             if(n->esquerda->tipo == VOID){
-                printf("ERRO SEMANTICO: variavel '%s' declarada como void\n",
-                       n->dado.id);
+                printf("ERRO SEMANTICO: variavel '%s' declarada como void 'LINHA %d',\n",
+                       n->dado.id,n->linha);
             }
             declara(n->dado.id, n->esquerda->tipo, n->linha);
             n->tipoValor = n->esquerda->tipo;
@@ -177,8 +178,8 @@ void analisa(AST *n) {
                 const char *right =
                     (n->direita->tipo == ID) ? n->direita->dado.id : "<expr>";
 
-                printf("ERRO SEMANTICO: operação inválida entre '%s' e '%s'\n",
-                    left, right);
+                printf("ERRO SEMANTICO: operação inválida entre '%s' e '%s' 'LINHA %d' \n",
+                    left, right, n->linha);
             }
             
             
@@ -198,7 +199,17 @@ void analisa(AST *n) {
 void imprimeTabela(Simbolo *listaSimbolo){
     Simbolo *tmpImprime = listaSimbolo;
     while(tmpImprime != NULL){
-        printf("nome %s tipo %d linha %d escopo %s\n",tmpImprime->nome, tmpImprime->tipo, tmpImprime->linha, tmpImprime->escopo );
+        printf("nome %s tipo %s linha %d escopo %s\n",tmpImprime->nome, tipoToString(tmpImprime->tipo), tmpImprime->linha, tmpImprime->escopo );
         tmpImprime = tmpImprime->prox;
+    }
+}
+
+char * tipoToString(Tipo tipo) {
+    switch (tipo) {
+        case INT: return "int";
+        case VOID: return "void";
+        case FUNCAO: return "funcao";
+        case PARAM: return "parametro";
+        default: return "outro";
     }
 }

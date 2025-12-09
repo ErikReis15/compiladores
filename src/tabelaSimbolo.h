@@ -21,3 +21,4 @@ void declara(char *nome, Tipo tipo, int linha);
 void analisa(AST *n);
 Simbolo *busca(char *nome);
 void imprimeTabela(Simbolo *listaSimbolo);
+char * tipoToString(Tipo tipo);

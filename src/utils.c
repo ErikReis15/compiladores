@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ast.h"
+
 char * operadorToString(Operador op) {
     switch (op) {
         case SOMA: return "+";

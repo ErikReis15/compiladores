@@ -122,6 +122,7 @@ param:
         $$ = novoNo(PARAM);
         $$->dado.id = strdup($2);
         $$->esquerda = $1;
+        
     }
     | tipo_espec T_ID T_ACOLCHETE T_FCOLCHETE {
         $$ = novoNo(PARAM);

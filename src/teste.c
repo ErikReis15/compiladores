@@ -1,8 +1,13 @@
-int main(void) {
-    int x;
-    x = 5 + 3 * 2;
-    if (x > 5)
-        x = x - 1;
+int gcd(int u, int v)
+{
+if (v == 0) return u;
+else return gcd(v, u - (u/v) * v);
+}
 
-    return x;
+void main(void)
+{
+int x; int y;
+x = 1;
+y = 2;
+output(gcd(x, y));
 }
