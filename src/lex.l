@@ -23,7 +23,7 @@ int lineno = 1;
 <COMMENT>{
     "*/"                 { BEGIN(INITIAL); }
     "\n"                 { lineno++; }
-    .                    { /* ignora qualquer outro caractere */ }
+    .                    ;
 }
 
 "if" {return T_IF;}
