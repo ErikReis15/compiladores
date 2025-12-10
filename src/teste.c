@@ -4,6 +4,8 @@ if (v == 0) return u;
 else return gcd(v, u - (u/v) * v);
 }
 
+/*Lex comentário :D*/
+
 void main(void)
 {
 int x; int y;

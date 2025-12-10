@@ -13,9 +13,18 @@
 int lineno = 1;
 %}
 
+%x COMMENT
+
 %%
 
 [ \t\r]+ ;
+"/*"                     { BEGIN(COMMENT); }
+
+<COMMENT>{
+    "*/"                 { BEGIN(INITIAL); }
+    "\n"                 { lineno++; }   /* conta linhas dentro do comentário */
+    .                    { /* ignora qualquer outro caractere */ }
+}
 
 "if" {return T_IF;}
 "else" {return T_ELSE;}
@@ -24,8 +33,6 @@ int lineno = 1;
 "void" {return T_VOID;}
 "return" {return T_RETURN;}
 
-"/*" {return T_ACOMENTARIO;}
-"*/" {return T_FCOMENTARIO;}
 ">=" {return T_MAIORI;}
 "<=" {return T_MENORI; }
 "==" {return T_IGUAL;}
