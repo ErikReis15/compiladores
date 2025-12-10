@@ -22,7 +22,7 @@ int lineno = 1;
 
 <COMMENT>{
     "*/"                 { BEGIN(INITIAL); }
-    "\n"                 { lineno++; }   /* conta linhas dentro do comentário */
+    "\n"                 { lineno++; }
     .                    { /* ignora qualquer outro caractere */ }
 }
 
