@@ -10,10 +10,8 @@
     extern FILE *yyin;
     extern int lineno;
     extern char* yytext;
-    extern int yychar;
     AST *raiz = NULL;
 
-    int error_token = -1;
     void yyerror(const char *s);
 
 %}
