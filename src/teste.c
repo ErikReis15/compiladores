@@ -8,8 +8,13 @@ else return gcd(v, u - (u/v) * v);
 
 void main(void)
 {
-int x; int y;
-x = 1;
+int x[4];
+int y;
 y = 2;
-output(gcd(x, y));
+x[0] = 10; 
+x[1] = 8;
+x[2] = 6;
+x[3] = 4;
+y = 2;
+output(gcd(x[0], y));
 }
