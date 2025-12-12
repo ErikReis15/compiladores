@@ -83,8 +83,10 @@ var_decl:
     ;
 
 tipo_espec:
-    T_INT {$$ = novoNo(INT);}
-    | T_VOID {$$ = novoNo(VOID);}
+    T_INT {$$ = novoNo(INT);
+           $$->linha = lineno;}
+    | T_VOID {$$ = novoNo(VOID);
+              $$->linha = lineno;}
     ;
 
 fun_decl:
@@ -95,7 +97,7 @@ fun_decl:
         $$->esquerda = $1;
         $$->meio = $4;
         $$->direita = $6;
-        $$->linha = lineno;
+        $$->linha = $1->linha;
     }
     ;
 

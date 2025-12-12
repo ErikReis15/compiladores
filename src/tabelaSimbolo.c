@@ -20,7 +20,6 @@ void saiEscopo() {
 
     Simbolo *simbolo = topo->simbolos;
     while (simbolo) {
-        salvaSimboloTabela(simbolo->nome, simbolo->tipo, simbolo->linha, topo->local);
         Simbolo *removida = simbolo;
         simbolo = simbolo->prox;
         free(removida->nome);
@@ -45,6 +44,7 @@ void declara(char *nome, Tipo tipo, int linha) {
         }
     }
 
+    salvaSimboloTabela(nome, tipo, linha, topo->local);
     Simbolo *s = malloc(sizeof(Simbolo));
     s->nome = strdup(nome);
     s->tipo = tipo;
@@ -198,8 +198,11 @@ void analisa(AST *n) {
 
 void imprimeTabela(Simbolo *listaSimbolo){
     Simbolo *tmpImprime = listaSimbolo;
+    printf("\n-----------TABELA DE SIMBOLOS-----------\n");
+    printf("|--NOME--|--TIPO--|--LINHA--|--ESCOPO--|\n");
     while(tmpImprime != NULL){
-        printf("nome %s tipo %s linha %d escopo %s\n",tmpImprime->nome, tipoToString(tmpImprime->tipo), tmpImprime->linha, tmpImprime->escopo );
+        printf("------------------------------------\n");
+        printf("| %s | %s | %d | %s |\n",tmpImprime->nome, tipoToString(tmpImprime->tipo), tmpImprime->linha, tmpImprime->escopo );
         tmpImprime = tmpImprime->prox;
     }
 }

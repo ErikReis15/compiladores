@@ -19,7 +19,7 @@ AST * novoNo(Tipo tipo){
 void printAST(AST *n, int nivel) {
     if (!n) return;
 
-    for (int i = 0; i < nivel; i++) printf("  ");
+    for (int i = 0; i < nivel; i++) printf("   ");
 
     switch (n->tipo) {
         case VAL:     printf("(VAL %d)\n", n->dado.valor); break;
