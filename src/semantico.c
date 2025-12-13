@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "semantico.h"
+#include "utils.h"
 
 Escopo *topo = NULL;
 
@@ -30,7 +31,7 @@ void saiEscopo() {
     free(fechado);
 }
 
-void declara(char *nome, Tipo tipo, int linha, Categoria categoria) {
+void declara(char *nome, Tipo tipo, int linha, Categoria categoria, int tamanho) {
     if (!topo) {
         printf("ERRO INTERNO: sem escopo ativo\n");
         return;
@@ -43,7 +44,7 @@ void declara(char *nome, Tipo tipo, int linha, Categoria categoria) {
         }
     }
 
-    salvaSimboloTabela(nome, tipo, linha, topo->local, categoria);
+    salvaSimboloTabela(nome, tipo, linha, topo->local, categoria, tamanho);
 
     Simbolo *s = malloc(sizeof(Simbolo));
     s->nome = strdup(nome);
@@ -74,7 +75,7 @@ void analisa(AST *n) {
         break;
 
     case FUNCAO:
-        declara(n->dado.id, INT, n->linha, C_FUNCAO);
+        declara(n->dado.id, INT, n->linha, C_FUNCAO,0);
 
         entraEscopo(n->dado.id);
         analisa(n->meio);
@@ -83,7 +84,7 @@ void analisa(AST *n) {
         break;
 
     case PARAM:
-        declara(n->dado.id, n->esquerda->tipo, n->linha, C_PARAMETRO);
+        declara(n->dado.id, n->esquerda->tipo, n->linha, C_PARAMETRO,0);
         n->tipoValor = n->esquerda->tipo;
         break;
 
@@ -92,15 +93,27 @@ void analisa(AST *n) {
             printf("ERRO SEMANTICO: variavel '%s' declarada como void (linha %d)\n",
                    n->dado.id, n->linha);
         }
-        declara(n->dado.id, n->esquerda->tipo, n->linha, C_VARIAVEL);
+        declara(n->dado.id, n->esquerda->tipo, n->linha, C_VARIAVEL,0);
+        n->tipoValor = n->esquerda->tipo;
+        break;
+    
+    case DECLARAVETOR:
+        if (n->esquerda->tipo == VOID) {
+            printf("ERRO SEMANTICO: variavel '%s' declarada como void (linha %d)\n",
+                   n->dado.id, n->linha);
+        }
+        declara(n->dado.id, n->esquerda->tipo, n->linha, C_VARIAVEL, n->direita->dado.valor);
         n->tipoValor = n->esquerda->tipo;
         break;
 
     case ID: {
         Simbolo *s = busca(n->dado.id);
-        if (!s)
+        if (!s){
             printf("ERRO SEMANTICO: variavel '%s' nao declarada 'LINHA - %d'\n", n->dado.id, n->linha);
-        else
+        }
+        else if (n->direita != NULL && n->direita->dado.valor > s->tamanho) {
+            printf("ERRO SEMANTICO: indice fora do limite '%s' (linha %d)\n", n->dado.id, n->linha);
+        }
             n->tipoValor = s->tipo;
         break;
     }
@@ -151,7 +164,7 @@ void analisa(AST *n) {
 
         n->tipoValor = INT;
         break;
-
+    
     default:
         analisa(n->esquerda);
         analisa(n->meio);
@@ -175,6 +188,6 @@ void analisaRegra(Simbolo *tabela){
 }
 
 void inicializacaoRegrasGlobais(){
-    salvaSimboloTabela("input", INT, 0, "global", C_FUNCAO);
-    salvaSimboloTabela("output", VOID, 0, "global", C_FUNCAO);
+    salvaSimboloTabela("input", INT, 0, "global", C_FUNCAO,0);
+    salvaSimboloTabela("output", VOID, 0, "global", C_FUNCAO,0);
 }

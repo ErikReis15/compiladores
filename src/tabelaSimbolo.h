@@ -13,6 +13,7 @@ typedef struct Simbolo {
     char *nome;
     Tipo tipo;
     int linha;
+    int tamanho;
     Categoria categoria;
     char *escopo;
     struct Simbolo *prox;
@@ -20,7 +21,7 @@ typedef struct Simbolo {
 
 extern Simbolo *listaSimbolo;
 
-void salvaSimboloTabela(char *nome, Tipo tipo, int linha, char *escopo, Categoria categoria);
+void salvaSimboloTabela(char *nome, Tipo tipo, int linha, char *escopo, Categoria categoria, int tamanho);
 void imprimeTabela(Simbolo *listaSimbolo);
 
 #endif

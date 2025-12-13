@@ -6,12 +6,13 @@
 
 Simbolo *listaSimbolo = NULL;
 
-void salvaSimboloTabela(char *nome, Tipo tipo, int linha, char *escopo, Categoria categoria) {
+void salvaSimboloTabela(char *nome, Tipo tipo, int linha, char *escopo, Categoria categoria, int tamanho) {
     Simbolo *s = malloc(sizeof(Simbolo));
 
     s->nome   = strdup(nome);
     s->tipo   = tipo;
     s->linha  = linha;
+    s->tamanho = tamanho;
     s->escopo = strdup(escopo);
     s->categoria = categoria;
     s->prox   = NULL;

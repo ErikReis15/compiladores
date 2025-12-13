@@ -12,7 +12,7 @@ typedef struct Escopo {
 
 void entraEscopo(char *local);
 void saiEscopo();
-void declara(char *nome, Tipo tipo, int linha, Categoria categoria);
+void declara(char *nome, Tipo tipo, int linha, Categoria categoria, int tamanho);
 Simbolo *busca(char *nome);
 void analisa(AST *n);
 void analisaRegra(Simbolo *tabela);

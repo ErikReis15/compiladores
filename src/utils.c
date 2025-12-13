@@ -28,7 +28,7 @@ char * tipoToString(Tipo tipo) {
         case VOID: return "void";
         case FUNCAO: return "funcao";
         case PARAM: return "parametro";
-        default: return "?";
+        default: return "erro";
     }
 }
 
