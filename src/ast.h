@@ -25,6 +25,6 @@ typedef struct AST {
 
 AST *novoNo(Tipo tipo);
 
-void printAST(AST *n, int nivel);
+void printAST(AST *n, int nivel, char direcao);
 
 #endif 
