@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "ast.h"
 #include "tabelaSimbolo.h"
+#include "quad.c"
 
 extern AST *raiz;
 extern Simbolo *listaSimbolo;
@@ -23,6 +24,7 @@ int main(int argc, char **argv){
         analisa(raiz);
         saiEscopo();
         imprimeTabela(listaSimbolo);
+        printTAC(raiz, 0);
     } 
 
  

@@ -9,13 +9,10 @@ else return gcd(v, u - (u/v) * v);
 
 void main(void)
 {
-int x[4];
+int x;
 int y;
 y = 2;
-x[0] = 10; 
-x[1] = 8;
-x[2] = 6;
-x[3] = 4;
-y = 2;
-output(gcd(x[0], y));
+y = x + y + 1;
+
+output(gcd(x[0], y + 2 + x));
 }
