@@ -221,12 +221,14 @@ var:
     T_ID {
         $$ = novoNo(ID);
         $$->dado.id = strdup($1);
+        $$->linha = lineno;
         }
 
     | T_ID T_ACOLCHETE exp T_FCOLCHETE {
         $$ = novoNo(ID);
         $$->dado.id = strdup($1);
         $$->direita = $3;
+        $$->linha = lineno;
         }
     ;
 

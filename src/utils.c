@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "ast.h"
+#include "tabelaSimbolo.h"
 
 char * operadorToString(Operador op) {
     switch (op) {
@@ -21,4 +22,21 @@ char * operadorToString(Operador op) {
     }
 }
 
+char * tipoToString(Tipo tipo) {
+    switch (tipo) {
+        case INT: return "int";
+        case VOID: return "void";
+        case FUNCAO: return "funcao";
+        case PARAM: return "parametro";
+        default: return "erro";
+    }
+}
 
+char * categoriaToString(Categoria categoria) {
+    switch (categoria) {
+        case C_VARIAVEL: return "variavel";
+        case C_FUNCAO: return "funcao";
+        case C_PARAMETRO: return "parametro";
+        default: return "?";
+    }
+}

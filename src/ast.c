@@ -16,31 +16,32 @@ AST * novoNo(Tipo tipo){
     return no;
 }
 
-void printAST(AST *n, int nivel) {
+void printAST(AST *n, int nivel, char c) {
     if (!n) return;
 
     for (int i = 0; i < nivel; i++) printf("   ");
 
     switch (n->tipo) {
-        case VAL:     printf("(VAL %d)\n", n->dado.valor); break;
-        case ID:      printf("(ID \"%s\")\n",n->dado.id); break;
-        case OP:      printf("(OP %d)\n", n->dado.operador); break;
-        case IF:      printf("(IF)\n"); break;
-        case IF_ELSE: printf("(IF_ELSE)\n"); break;
-        case WHILE:   printf("(WHILE)\n"); break;
-        case SEQ:     printf("(SEQ)\n"); break;
-        case FUNCAO:  printf("(FUNCAO %s)\n", n->dado.id ); break;
-        case DECLARA: printf("(DECLARA %s)\n", n->dado.id ); break;
-        case INT:    printf("(INT)\n"); break;
-        case VOID: printf("(VOID)\n"); break;
-        case CHAMADA: printf("(CHAMADA %s)\n", n->dado.id ); break;
-        case PARAM:   printf("(PARAM %s)\n", n->dado.id ); break;
-        case RETURN:  printf("(RETURN)\n"); break;
-        default:      printf("(NODE %d)\n", n->tipo); break;
+        case VAL:     printf("%c-(VAL %d)\n", c,n->dado.valor); break;
+        case ID:      printf("%c-(ID \"%s\")\n",c,n->dado.id); break;
+        case OP:      printf("%c-(OP %s)\n", c,operadorToString(n->dado.operador)); break;
+        case IF:      printf("%c-(IF)\n",c); break;
+        case IF_ELSE: printf("%c-(IF_ELSE)\n",c); break;
+        case WHILE:   printf("%c-(WHILE)\n",c); break;
+        case SEQ:     printf("%c-(SEQ)\n",c); break;
+        case FUNCAO:  printf("%c-(FUNCAO %s)\n",c, n->dado.id ); break;
+        case DECLARA: printf("%c-(DECLARA %s)\n",c, n->dado.id ); break;
+        case DECLARAVETOR: printf("%c-(DECLARAVETOR %s)\n",c, n->dado.id ); break;
+        case INT:    printf("%c-(INT)\n",c); break;
+        case VOID: printf("%c-(VOID)\n",c); break;
+        case CHAMADA: printf("%c-(CHAMADA %s)\n",c, n->dado.id ); break;
+        case PARAM:   printf("%c-(PARAM %s)\n",c, n->dado.id ); break;
+        case RETURN:  printf("%c-(RETURN)\n",c); break;
+        default:      printf("%c-(NODE %d)\n",c, n->tipo); break;
     }
 
-    printAST(n->esquerda, nivel + 1);
-    printAST(n->meio,   nivel + 1);
-    printAST(n->direita, nivel + 1);
+    printAST(n->esquerda, nivel + 1, 'E');
+    printAST(n->meio,   nivel + 1, 'M');
+    printAST(n->direita, nivel + 1, 'D');
 }
 

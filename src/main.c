@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "tabelaSimbolo.h"
 #include "quad.c"
+#include "semantico.h"
 
 extern AST *raiz;
 extern Simbolo *listaSimbolo;
@@ -19,10 +20,12 @@ int main(int argc, char **argv){
 
     if (yyparse() == 0) {
         printf("=== SEMANTICO ===\n");
-        printAST(raiz, 0);
+        printAST(raiz, 0, 'r');
+        inicializacaoRegrasGlobais();
         entraEscopo("global");
         analisa(raiz);
         saiEscopo();
+        analisaRegra(listaSimbolo);
         imprimeTabela(listaSimbolo);
         printTAC(raiz, 0);
     } 
