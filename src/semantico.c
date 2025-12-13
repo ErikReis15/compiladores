@@ -174,4 +174,7 @@ void analisaRegra(Simbolo *tabela){
     }
 }
 
-void inicializacao
+void inicializacaoRegrasGlobais(){
+    salvaSimboloTabela("input", INT, 0, "global", C_FUNCAO);
+    salvaSimboloTabela("output", VOID, 0, "global", C_FUNCAO);
+}

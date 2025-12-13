@@ -16,5 +16,6 @@ void declara(char *nome, Tipo tipo, int linha, Categoria categoria);
 Simbolo *busca(char *nome);
 void analisa(AST *n);
 void analisaRegra(Simbolo *tabela);
+void inicializacaoRegrasGlobais();
 
 #endif
