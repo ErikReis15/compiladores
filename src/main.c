@@ -20,6 +20,7 @@ int main(int argc, char **argv){
     if (yyparse() == 0) {
         printf("=== SEMANTICO ===\n");
         printAST(raiz, 0, 'r');
+        gerarASTDot(raiz, "ast.dot");
         inicializacaoRegrasGlobais();
         entraEscopo("global");
         analisa(raiz);

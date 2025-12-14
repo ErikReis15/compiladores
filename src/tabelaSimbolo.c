@@ -40,3 +40,11 @@ void imprimeTabela(Simbolo *listaSimbolo) {
                categoriaToString(s->categoria));
     }
 }
+
+Simbolo *buscaTabela(char *nome) {
+    for (Simbolo *s = listaSimbolo; s; s = s->prox){
+            if (!strcmp(s->nome, nome))
+                return s;
+    }
+    return NULL;
+}

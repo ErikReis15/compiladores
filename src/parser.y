@@ -310,6 +310,7 @@ ativacao:
         $$ = novoNo(CHAMADA);
         $$->dado.id = $1;
         $$->direita = $3;
+        $$->linha = lineno;
         }
     ;
 

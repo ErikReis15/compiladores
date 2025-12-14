@@ -26,5 +26,7 @@ typedef struct AST {
 AST *novoNo(Tipo tipo);
 
 void printAST(AST *n, int nivel, char direcao);
+void gerarASTDot(AST *raiz, const char *arquivo);
+void gerarASTDotRec(AST *n, FILE *f);
 
 #endif 

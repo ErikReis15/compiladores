@@ -45,3 +45,56 @@ void printAST(AST *n, int nivel, char c) {
     printAST(n->direita, nivel + 1, 'D');
 }
 
+void gerarASTDotRec(AST *n, FILE *f) {
+    if (!n) return;
+
+    fprintf(f, "  n%p [label=\"", (void*)n);
+
+    switch (n->tipo) {
+        case VAL: fprintf(f, "VAL\\n%d", n->dado.valor); break;
+        case ID: fprintf(f, "ID\\n%s", n->dado.id); break;
+        case OP: fprintf(f, "OP\\n%s", operadorToString(n->dado.operador)); break;
+        case IF: fprintf(f, "IF"); break;
+        case IF_ELSE: fprintf(f, "IF_ELSE"); break;
+        case WHILE: fprintf(f, "WHILE"); break;
+        case SEQ: fprintf(f, "SEQ"); break;
+        case FUNCAO: fprintf(f, "FUNCAO\\n%s", n->dado.id); break;
+        case DECLARA: fprintf(f, "DECLARA\\n%s", n->dado.id); break;
+        case DECLARAVETOR: fprintf(f, "DECLARAVETOR\\n%s", n->dado.id); break;
+        case INT: fprintf(f, "INT"); break;
+        case VOID: fprintf(f, "VOID"); break;
+        case CHAMADA: fprintf(f, "CHAMADA\\n%s", n->dado.id); break;
+        case PARAM: fprintf(f, "PARAM\\n%s", n->dado.id); break;
+        case RETURN: fprintf(f, "RETURN"); break;
+        default: fprintf(f, "NODE\\n%d", n->tipo); break;
+    }
+
+    fprintf(f, "\"];\n");
+
+    if (n->esquerda) {
+        fprintf(f, "  n%p -> n%p [label=\"E\"];\n",(void*)n, (void*)n->esquerda);
+        gerarASTDotRec(n->esquerda, f);
+    }
+
+    if (n->meio) {
+        fprintf(f, "  n%p -> n%p [label=\"M\"];\n",(void*)n, (void*)n->meio);
+        gerarASTDotRec(n->meio, f);
+    }
+
+    if (n->direita) {
+        fprintf(f, "  n%p -> n%p [label=\"D\"];\n",(void*)n, (void*)n->direita);
+        gerarASTDotRec(n->direita, f);
+    }
+}
+
+void gerarASTDot(AST *raiz, const char *arquivo) {
+    FILE *f = fopen(arquivo, "w");
+    if (!f) return;
+
+    fprintf(f, "digraph AST {\n");
+
+    gerarASTDotRec(raiz, f);
+
+    fprintf(f, "}\n");
+    fclose(f);
+}

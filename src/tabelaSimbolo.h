@@ -23,5 +23,6 @@ extern Simbolo *listaSimbolo;
 
 void salvaSimboloTabela(char *nome, Tipo tipo, int linha, char *escopo, Categoria categoria, int tamanho);
 void imprimeTabela(Simbolo *listaSimbolo);
+Simbolo *buscaTabela(char *nome);
 
 #endif

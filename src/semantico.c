@@ -55,7 +55,7 @@ void declara(char *nome, Tipo tipo, int linha, Categoria categoria, int tamanho)
     topo->simbolos = s;
 }
 
-Simbolo *busca(char *nome) {
+Simbolo *buscaEscopo(char *nome) {
     for (Escopo *e = topo; e; e = e->prox) {
         for (Simbolo *s = e->simbolos; s; s = s->prox) {
             if (!strcmp(s->nome, nome))
@@ -75,12 +75,18 @@ void analisa(AST *n) {
         break;
 
     case FUNCAO:
-        declara(n->dado.id, INT, n->linha, C_FUNCAO,0);
+        declara(n->dado.id, n->esquerda->tipo, n->linha, C_FUNCAO,0);
 
         entraEscopo(n->dado.id);
         analisa(n->meio);
         analisa(n->direita);
         saiEscopo();
+
+        if(n->direita->tipoValor != n->esquerda->tipo){
+            printf("ERRO SEMANTICO: tipo de retorno da funcao '%s' nao corresponde (linha %d)\n",
+                   n->dado.id, n->linha);
+        }
+
         break;
 
     case PARAM:
@@ -107,7 +113,7 @@ void analisa(AST *n) {
         break;
 
     case ID: {
-        Simbolo *s = busca(n->dado.id);
+        Simbolo *s = buscaEscopo(n->dado.id);
         if (!s){
             printf("ERRO SEMANTICO: variavel '%s' nao declarada 'LINHA - %d'\n", n->dado.id, n->linha);
         }
@@ -121,6 +127,11 @@ void analisa(AST *n) {
     case SEQ:
         analisa(n->esquerda);
         analisa(n->direita);
+
+        if(n->direita->tipo != INDEFINIDO){
+            n->tipoValor = n->direita->tipoValor;
+        }
+
         break;
 
     case IF:
@@ -128,6 +139,8 @@ void analisa(AST *n) {
         entraEscopo("if");
         analisa(n->meio);
         saiEscopo();
+
+        n->tipoValor = n->meio->tipoValor;
         break;
 
     case WHILE:
@@ -135,6 +148,8 @@ void analisa(AST *n) {
         entraEscopo("while");
         analisa(n->meio);
         saiEscopo();
+
+        n->tipoValor = n->meio->tipoValor;
         break;
 
     case IF_ELSE:
@@ -147,24 +162,60 @@ void analisa(AST *n) {
         entraEscopo("else");
         analisa(n->direita);
         saiEscopo();
+
+        if(n->meio->tipoValor == n->direita->tipoValor){
+            n->tipoValor = n->meio->tipoValor;
+        }
+
+         else{
+            printf("ERRO SEMANTICO: tipos diferentes de retorno no if-else (linha %d)\n", n->linha);
+        }
+
         break;
 
     case RETURN:
         analisa(n->esquerda);
+        if(n->esquerda != NULL){
+            n->tipoValor = n->esquerda->tipoValor;
+        }
+        else{
+            n->tipoValor = VOID;
+        }
         break;
 
     case OP:
         analisa(n->esquerda);
         analisa(n->direita);
 
-        if (n->esquerda->tipoValor != INT ||
-            n->direita->tipoValor != INT) {
-            printf("ERRO SEMANTICO: operacao invalida (linha %d)\n", n->linha);
+        if ((n->esquerda->tipoValor != INT || n->direita->tipoValor != INT)) {
+            printf("ERRO SEMANTICO: operacao invalida (linha %d)\n", n->esquerda->linha);
         }
 
+        if (n->direita && n->direita->tipo == CHAMADA){
+            if (n->dado.operador == ATRIBUICAO && strcmp(n->direita->dado.id,"input") == 0 && n->esquerda->tipoValor == VOID) {
+                printf("ERRO SEMANTICO: atribuicao de valor de void para 'input' (linha %d)\n", n->esquerda->linha);
+
+            }
+
+            if (n->dado.operador == ATRIBUICAO && strcmp(n->direita->dado.id,"output") == 0) {
+                printf("ERRO SEMANTICO: 'output' não pode ser atribuido (linha %d)\n", n->esquerda->linha);
+
+            }
+        }
         n->tipoValor = INT;
         break;
     
+    case CHAMADA: 
+        Simbolo *s = buscaTabela(n->dado.id);
+        if (s == NULL){
+        printf("ERRO SEMANTICO: chamada de funcao '%s' nao declarada (linha %d)\n", n->dado.id, n->linha);
+        }
+        else if (s->categoria == C_FUNCAO){ 
+            analisa(n->direita);
+            n->tipoValor = s->tipo;
+        }
+        break;
+
     default:
         analisa(n->esquerda);
         analisa(n->meio);

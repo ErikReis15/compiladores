@@ -1,8 +1,12 @@
-
+int gcd(int u, int v){
+if (v == 0) 
+    return u;
+else 
+    return gcd(v, u - (u/v) * v);
+    }
 void main(void)
 {
-int x;
-int y[4];
-y[6] = 3;
-x = 3;
+int x[2];
+x = 4;
+return;
 }
