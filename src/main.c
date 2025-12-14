@@ -31,7 +31,9 @@ int main(int argc, char **argv){
         *label = 1;
         int *reg = malloc(sizeof(int));
         *reg = 0;
-        printTAC(raiz, 0, reg, label);
+        int *param = malloc(sizeof(int));
+        *param = -1;
+        printTAC(raiz, 0, reg, label, param);
     } 
 
  
