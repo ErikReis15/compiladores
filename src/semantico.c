@@ -32,10 +32,6 @@ void saiEscopo() {
 }
 
 void declara(char *nome, Tipo tipo, int linha, Categoria categoria, int tamanho) {
-    if (!topo) {
-        printf("ERRO INTERNO: sem escopo ativo\n");
-        return;
-    }
 
     for (Simbolo *s = topo->simbolos; s; s = s->prox) {
         if (!strcmp(s->nome, nome)) {

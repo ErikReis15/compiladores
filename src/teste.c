@@ -1,12 +1,22 @@
 int gcd(int u, int v){
-if (v == 0) 
-    return u;
-else 
-    return gcd(v, u - (u/v) * v);
-    }
+    int a;
+    int b;
+    if (v == 0) 
+        return u;
+    else 
+        return gcd(v, u - (u/v) * v);
+}
+
+
 void main(void)
 {
-int x[2];
-x = 4;
+    int a;
+    int x;
+    int v[3];
+    a = x + gcd(4,0)/2;
+    2 + 1;
+    v[1] = 3;
+    v[5] = 2;
+    output(a);
 return;
 }
