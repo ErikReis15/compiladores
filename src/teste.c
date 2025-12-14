@@ -6,7 +6,7 @@ int gcd(int u, int v)
     else return gcd(v, u - (u/v) * v);
 }
 */
-int teste(int x, int y){
+int funcao(int x, int y){
     x = x + 2;
     return x + 1 + x / 3;
 }
@@ -29,8 +29,9 @@ output(gcd(x[0], y + 2 + x));
 */
 /*
 output(teste(x, y));
-y = teste(x+2, 4+1+1, y);
 */
-y = teste(teste1(x), teste(x, y), 3+2, teste(x, y));
+x = funcao(10 + funcao(4+x)) +funcao(1,4,0);
+x = funcao(10 - x, y-3+5, 10) + 3 +funcao(1,4,0);
+y = teste(x+2, 5 + teste(x+teste(y)) + 4);
 return 1 + 2;
 }
