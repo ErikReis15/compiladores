@@ -27,7 +27,11 @@ int main(int argc, char **argv){
         saiEscopo();
         analisaRegra(listaSimbolo);
         imprimeTabela(listaSimbolo);
-        printTAC(raiz, 0);
+        int *label = malloc(sizeof(int));
+        *label = 1;
+        int *reg = malloc(sizeof(int));
+        *reg = 0;
+        printTAC(raiz, 0, reg, label);
     } 
 
  
