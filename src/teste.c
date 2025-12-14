@@ -18,5 +18,10 @@ void main(void)
     v[1] = 3;
     v[5] = 2;
     output(a);
+    if(a > 0){
+        int b;
+        b = 2;
+    }
+    x = b;
 return;
 }
