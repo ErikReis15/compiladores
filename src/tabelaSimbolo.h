@@ -6,7 +6,8 @@
 typedef enum {
     C_VARIAVEL,
     C_FUNCAO,
-    C_PARAMETRO
+    C_PARAMETRO,
+    C_VETOR
 } Categoria;
 
 typedef struct Simbolo {

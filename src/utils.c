@@ -37,6 +37,7 @@ char * categoriaToString(Categoria categoria) {
         case C_VARIAVEL: return "variavel";
         case C_FUNCAO: return "funcao";
         case C_PARAMETRO: return "parametro";
+        case C_VETOR: return "vetor";
         default: return "?";
     }
 }

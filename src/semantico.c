@@ -48,6 +48,7 @@ void declara(char *nome, Tipo tipo, int linha, Categoria categoria, int tamanho)
     s->linha = linha;
     s->escopo = NULL;   
     s->prox = topo->simbolos;
+    s->tamanho = tamanho;
     topo->simbolos = s;
 }
 
@@ -104,7 +105,7 @@ void analisa(AST *n) {
             printf("ERRO SEMANTICO: variavel '%s' declarada como void (linha %d)\n",
                    n->dado.id, n->linha);
         }
-        declara(n->dado.id, n->esquerda->tipo, n->linha, C_VARIAVEL, n->direita->dado.valor);
+        declara(n->dado.id, n->esquerda->tipo, n->linha, C_VETOR, n->direita->dado.valor);
         n->tipoValor = n->esquerda->tipo;
         break;
 
@@ -113,10 +114,12 @@ void analisa(AST *n) {
         if (!s){
             printf("ERRO SEMANTICO: variavel '%s' nao declarada 'LINHA - %d'\n", n->dado.id, n->linha);
         }
-        else if (n->direita != NULL && n->direita->dado.valor > s->tamanho) {
+        if (s != NULL && n->direita != NULL && n->direita->dado.valor > s->tamanho) {
             printf("ERRO SEMANTICO: indice fora do limite '%s' (linha %d)\n", n->dado.id, n->linha);
         }
+        if(s){
             n->tipoValor = s->tipo;
+        }
         break;
     }
 
