@@ -2,3 +2,5 @@ src/parser.tab.c
 src/parser.tab.h
 src/lex.yy.c
 src/compilador
+src/ast.dot
+src/teste.c
