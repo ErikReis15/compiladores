@@ -27,3 +27,8 @@ Digite no terminal
 1º cd src
 
 2º make
+
+
+Apos realizar toda compilação execute no terminal estando no /src
+
+	./compilador teste.c
