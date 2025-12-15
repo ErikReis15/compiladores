@@ -147,8 +147,10 @@ void analisa(AST *n) {
         entraEscopo("while");
         analisa(n->meio);
         saiEscopo();
-
-        n->tipoValor = n->meio->tipoValor;
+        if(n->meio != NULL)
+            n->tipoValor = n->meio->tipoValor;
+        else 
+            n->tipoValor = VOID;
         break;
 
     case IF_ELSE:
