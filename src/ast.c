@@ -75,12 +75,10 @@ void gerarASTDotRec(AST *n, FILE *f) {
         fprintf(f, "  n%p -> n%p [label=\"E\"];\n",(void*)n, (void*)n->esquerda);
         gerarASTDotRec(n->esquerda, f);
     }
-
     if (n->meio) {
         fprintf(f, "  n%p -> n%p [label=\"M\"];\n",(void*)n, (void*)n->meio);
         gerarASTDotRec(n->meio, f);
     }
-
     if (n->direita) {
         fprintf(f, "  n%p -> n%p [label=\"D\"];\n",(void*)n, (void*)n->direita);
         gerarASTDotRec(n->direita, f);
@@ -92,9 +90,7 @@ void gerarASTDot(AST *raiz, const char *arquivo) {
     if (!f) return;
 
     fprintf(f, "digraph AST {\n");
-
     gerarASTDotRec(raiz, f);
-
     fprintf(f, "}\n");
     fclose(f);
 }

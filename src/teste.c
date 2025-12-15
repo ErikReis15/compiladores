@@ -6,7 +6,9 @@ else return gcd(v, u - (u/v) * v);
 void main(void)
 {
 int x; int y;
+
 x = input();
-y = input();
+x = output();
+
 output(gcd(x, y));
 }
