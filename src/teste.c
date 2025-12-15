@@ -5,10 +5,9 @@ else return gcd(v, u - (u/v) * v);
 }
 void main(void)
 {
-int x; int y;
-
-x = input();
-x = output();
-
-output(gcd(x, y));
+int x[2]; int y;
+x[0] = input();
+y = x[0] + 10;
+output(gcd(x[0], y));
+return;
 }

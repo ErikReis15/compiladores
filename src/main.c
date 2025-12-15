@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "tabelaSimbolo.h"
 #include "semantico.h"
+#include "quad.c"
 
 extern AST *raiz;
 extern Simbolo *listaSimbolo;
@@ -31,6 +32,13 @@ int main(int argc, char **argv){
 
         analisaRegra(listaSimbolo);
         imprimeTabela(listaSimbolo);
+        int *label = malloc(sizeof(int));
+        *label = 1;
+        int *reg = malloc(sizeof(int));
+        *reg = 0;
+        int *param = malloc(sizeof(int));
+        *param = -1;
+        printTAC(raiz, 0, reg, label, param);
     } 
 
  
