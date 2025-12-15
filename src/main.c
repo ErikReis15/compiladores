@@ -18,13 +18,17 @@ int main(int argc, char **argv){
     }
 
     if (yyparse() == 0) {
-        printf("=== SEMANTICO ===\n");
+        
+        printf("\n------- AST -------\n");
         printAST(raiz, 0, 'r');
         gerarASTDot(raiz, "ast.dot");
+        printf("\n");
+
         inicializacaoRegrasGlobais();
         entraEscopo("global");
         analisa(raiz);
         saiEscopo();
+
         analisaRegra(listaSimbolo);
         imprimeTabela(listaSimbolo);
     } 
