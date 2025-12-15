@@ -32,7 +32,6 @@ int main(int argc, char **argv){
 
         analisaRegra(listaSimbolo);
         imprimeTabela(listaSimbolo);
-
         int *label = malloc(sizeof(int));
         *label = 1;
         int *reg = malloc(sizeof(int));

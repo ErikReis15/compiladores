@@ -56,7 +56,7 @@ int lineno = 1;
 "[" {return T_ACOLCHETE;}
 "]" {return T_FCOLCHETE;}
 
-[0-9][0-9]* {yylval.ival = atoi(yytext); return T_NUM;}
+[0-9]+ {yylval.ival = atoi(yytext); return T_NUM;}
 [a-zA-Z][a-zA-Z]* {yylval.id = strdup(yytext); return T_ID;}
 
 "\n" {lineno++;}
